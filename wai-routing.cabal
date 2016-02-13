@@ -1,13 +1,13 @@
 name:                wai-routing
-version:             0.12.2
+version:             0.12.3
 synopsis:            Declarative routing for WAI.
 license:             MPL-2.0
 license-file:        LICENSE
 author:              Toralf Wittner
 maintainer:          Toralf Wittner <tw@dtex.org>
-copyright:           (C) 2014-2015 Toralf Wittner
-homepage:            https://github.com/twittner/wai-routing/
-bug-reports:         https://github.com/twittner/wai-routing/issues
+copyright:           (C) 2014-2016 Toralf Wittner
+homepage:            https://gitlab.com/twittner/wai-routing/
+bug-reports:         https://gitlab.com/twittner/wai-routing/issues
 stability:           experimental
 category:            Web
 build-type:          Simple
@@ -61,7 +61,7 @@ description:
 
 source-repository head
     type:             git
-    location:         git://github.com/twittner/wai-routing.git
+    location:         git@gitlab.com:twittner/wai-routing.git
 
 library
     default-language: Haskell2010
