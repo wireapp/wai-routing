@@ -1,5 +1,5 @@
 name:                wai-routing
-version:             0.12.3
+version:             0.13.0
 synopsis:            Declarative routing for WAI.
 license:             MPL-2.0
 license-file:        LICENSE
@@ -75,17 +75,17 @@ library
         Network.Wai.Routing.Predicate
 
     build-depends:
-        attoparsec            >= 0.10  && < 1.0
-      , base                  == 4.*
-      , bytestring            >= 0.10  && < 1.0
-      , bytestring-conversion >= 0.2   && < 1.0
-      , cookie                == 0.4.*
-      , case-insensitive      >= 1.1   && < 2.0
-      , http-types            >= 0.8   && < 1.0
-      , transformers          >= 0.3   && < 0.5
-      , wai                   >= 3.0   && < 4.0
-      , wai-predicates        == 0.8.*
-      , wai-route             == 0.3.*
+        attoparsec            >= 0.10
+      , base                  >= 4.6  && < 5.0
+      , bytestring            >= 0.10
+      , bytestring-conversion >= 0.2
+      , cookie                >= 0.4
+      , case-insensitive      >= 1.1
+      , http-types            >= 0.8
+      , transformers          >= 0.3
+      , wai                   >= 3.0
+      , wai-predicates        >= 0.8
+      , wai-route             >= 0.3
 
 test-suite wai-routing-tests
     type:             exitcode-stdio-1.0
@@ -99,7 +99,7 @@ test-suite wai-routing-tests
         Tests.Wai.Util
 
     build-depends:
-        base                  == 4.*
+        base
       , blaze-builder         >= 0.3
       , bytestring
       , bytestring-conversion
@@ -120,8 +120,8 @@ benchmark wai-routing-bench
     hs-source-dirs:   bench
     ghc-options:      -Wall -O2 -fwarn-tabs
     build-depends:
-        base          == 4.*
-      , criterion     >= 1.0.0.2 && < 2.0
+        base
+      , criterion     >= 1.0.0.2
       , http-types
       , wai
       , wai-predicates
