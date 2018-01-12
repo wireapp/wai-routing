@@ -14,6 +14,7 @@ module Network.Wai.Routing.Route
     , Meta (..)
     , prepare
     , route
+    , routeWithCustomNotFoundResponse
     , continue
     , addRoute
     , attach
@@ -197,12 +198,15 @@ examine (Routes r) = let St rr _ = execState r zero in
 -- Note that @route (prepare ...)@ behaves like a WAI 'Application' generalised to
 -- arbitrary monads.
 route :: Monad m => Tree (App m) -> Request -> Continue m -> m ResponseReceived
-route tr rq k =
-    case Tree.lookup tr (Tree.segments $ rawPathInfo rq) of
-        Just  e -> Tree.value e (fromReq (Tree.captured $ Tree.captures e) (fromRequest rq)) k
-        Nothing -> k notFound
+route = routeWithCustomNotFoundResponse notFound
   where
     notFound = responseLBS status404 [] Lazy.empty
+
+routeWithCustomNotFoundResponse :: Monad m => Response -> Tree (App m) -> Request -> Continue m -> m ResponseReceived
+routeWithCustomNotFoundResponse nf tr rq k =
+    case Tree.lookup tr (Tree.segments $ rawPathInfo rq) of
+        Just  e -> Tree.value e (fromReq (Tree.captured $ Tree.captures e) (fromRequest rq)) k
+        Nothing -> k nf
 
 -- | Prior to WAI 3.0 applications returned a plain 'Response'. @continue@
 -- turns such a function into a corresponding CPS version. For example:
