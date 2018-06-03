@@ -81,6 +81,7 @@ library
       , bytestring-conversion >= 0.2
       , cookie                >= 0.4
       , case-insensitive      >= 1.1
+      , data-default          >= 0.7
       , http-types            >= 0.8
       , transformers          >= 0.3
       , wai                   >= 3.0
