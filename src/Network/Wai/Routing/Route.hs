@@ -10,6 +10,7 @@
 module Network.Wai.Routing.Route
     ( Routes
     , App
+    , Config (..)
     , Continue
     , Meta (..)
     , prepare
@@ -79,8 +80,11 @@ data Handler m = Handler
 
 -- | Configuration to customize the route handler
 data Config = Config
-    { _notFound :: !Response
+    { notFoundResponse :: !Response
     }
+
+instance Default Config where
+    def = Config (responseLBS status404 [] Lazy.empty)
 
 data Pack m where
     Pack :: Predicate RoutingReq Error a
@@ -200,9 +204,6 @@ examine :: Routes a m b -> [Meta a]
 examine (Routes r) = let St rr _ = execState r zero in
     mapMaybe (\x -> Meta (_method x) (_path x) <$> _meta x) rr
 
-instance Default Config where
-    def = Config (responseLBS status404 [] Lazy.empty)
-
 -- | Routes requests to handlers based on predicated route declarations.
 -- Note that @route (prepare ...)@ behaves like a WAI 'Application' generalised to
 -- arbitrary monads.
@@ -213,7 +214,7 @@ routeWith :: Monad m => Config -> Tree (App m) -> Request -> Continue m -> m Res
 routeWith cfg tr rq k =
     case Tree.lookup tr (Tree.segments $ rawPathInfo rq) of
         Just  e -> Tree.value e (fromReq (Tree.captured $ Tree.captures e) (fromRequest rq)) k
-        Nothing -> k (_notFound cfg)
+        Nothing -> k (notFoundResponse cfg)
 
 -- | Prior to WAI 3.0 applications returned a plain 'Response'. @continue@
 -- turns such a function into a corresponding CPS version. For example:
