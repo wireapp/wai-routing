@@ -14,6 +14,7 @@ module Network.Wai.Routing.Route
     , Meta (..)
     , prepare
     , route
+    , routeWith
     , continue
     , addRoute
     , attach
@@ -45,6 +46,7 @@ import Control.Applicative hiding (Const)
 import Control.Monad
 import Control.Monad.Trans.State.Strict hiding (get, put)
 import Data.ByteString (ByteString)
+import Data.Default
 import Data.Either
 import Data.Function
 import Data.List hiding (head, delete)
@@ -52,7 +54,7 @@ import Data.Maybe (mapMaybe, catMaybes)
 import Data.Monoid
 import Network.HTTP.Types
 import Network.Wai
-import Network.Wai.Predicate
+import Network.Wai.Predicate hiding (def)
 import Network.Wai.Predicate.Request
 import Network.Wai.Route.Tree (Tree)
 import Network.Wai.Routing.Request
@@ -73,6 +75,11 @@ data Route a m = Route
 data Handler m = Handler
     { _delta   :: !Double
     , _handler :: m ResponseReceived
+    }
+
+-- | Configuration to customize the route handler
+data Config = Config
+    { _notFound :: !Response
     }
 
 data Pack m where
@@ -193,16 +200,20 @@ examine :: Routes a m b -> [Meta a]
 examine (Routes r) = let St rr _ = execState r zero in
     mapMaybe (\x -> Meta (_method x) (_path x) <$> _meta x) rr
 
+instance Default Config where
+    def = Config (responseLBS status404 [] Lazy.empty)
+
 -- | Routes requests to handlers based on predicated route declarations.
 -- Note that @route (prepare ...)@ behaves like a WAI 'Application' generalised to
 -- arbitrary monads.
 route :: Monad m => Tree (App m) -> Request -> Continue m -> m ResponseReceived
-route tr rq k =
+route = routeWith def
+
+routeWith :: Monad m => Config -> Tree (App m) -> Request -> Continue m -> m ResponseReceived
+routeWith cfg tr rq k =
     case Tree.lookup tr (Tree.segments $ rawPathInfo rq) of
         Just  e -> Tree.value e (fromReq (Tree.captured $ Tree.captures e) (fromRequest rq)) k
-        Nothing -> k notFound
-  where
-    notFound = responseLBS status404 [] Lazy.empty
+        Nothing -> k (_notFound cfg)
 
 -- | Prior to WAI 3.0 applications returned a plain 'Response'. @continue@
 -- turns such a function into a corresponding CPS version. For example:
